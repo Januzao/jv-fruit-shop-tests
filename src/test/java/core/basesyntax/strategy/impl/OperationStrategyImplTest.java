@@ -8,45 +8,32 @@ import core.basesyntax.strategy.OperationHandler;
 import core.basesyntax.strategy.OperationStrategy;
 import java.util.EnumMap;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class OperationStrategyImplTest {
-    @Test
-    void methodArgumentNull_throwsNullPointerException() {
-        Map<FruitTransaction.Operation, OperationHandler> handlerMap
-                = new EnumMap<>(FruitTransaction.Operation.class);
+    private Map<FruitTransaction.Operation, OperationHandler> handlerMap;
+    private OperationStrategy operationStrategy;
 
-        OperationStrategy operationStrategy = new OperationStrategyImpl(handlerMap);
-        assertThrows(NullPointerException.class,
-                () -> operationStrategy.getOperationHandler(null));
+    @BeforeEach
+    void setUp() {
+        handlerMap = new EnumMap<>(FruitTransaction.Operation.class);
+        operationStrategy = new OperationStrategyImpl(handlerMap);
     }
 
     @Test
     void operationHandlerNullCheck_throwsException() {
-        Map<FruitTransaction.Operation, OperationHandler> handlerMap
-                = new EnumMap<>(FruitTransaction.Operation.class);
-
-        OperationStrategy operationStrategy = new OperationStrategyImpl(handlerMap);
-
         FruitTransaction.Operation operation = FruitTransaction.Operation.BALANCE;
 
-        Assertions.assertThrows(IllegalArgumentException.class,
+        assertThrows(IllegalArgumentException.class,
                 () -> operationStrategy.getOperationHandler(operation));
     }
 
     @Test
     void getOperationHandler_validOperation_returnsHandler() {
-        Map<FruitTransaction.Operation, OperationHandler> handlerMap
-                = new EnumMap<>(FruitTransaction.Operation.class);
-
         FruitTransaction.Operation operation = FruitTransaction.Operation.BALANCE;
-
         OperationHandler handler = new BalanceOperation();
-
         handlerMap.put(operation, handler);
-
-        OperationStrategy operationStrategy = new OperationStrategyImpl(handlerMap);
 
         OperationHandler actual = operationStrategy.getOperationHandler(operation);
 

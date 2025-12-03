@@ -24,4 +24,9 @@ public class StorageImpl implements Storage {
     public Map<String, Integer> getFruitStore() {
         return new HashMap<>(fruitStore);
     }
+
+    @Override
+    public void clear() {
+        fruitStore.clear();
+    }
 }

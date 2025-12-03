@@ -8,4 +8,6 @@ public interface Storage {
     void put(String fruitName, int quantity);
 
     Map<String, Integer> getFruitStore();
+
+    void clear();
 }
