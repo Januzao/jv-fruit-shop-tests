@@ -1,16 +1,20 @@
 package core.basesyntax.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import core.basesyntax.db.Storage;
 import core.basesyntax.db.impl.StorageImpl;
 import core.basesyntax.service.ReportGenerator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ReportGeneratorImplTest {
+    private static final String HEADER = "fruit,quantity";
     private Storage storage;
     private ReportGenerator reportGenerator;
 
@@ -26,37 +30,35 @@ class ReportGeneratorImplTest {
     }
 
     @Test
-    void fileHeaderCheck_Ok() {
-        String report = reportGenerator.getReport();
-        String actual = report.split(System.lineSeparator())[0];
-        String expected = "fruit,quantity";
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void reportWithData_Ok() {
-        String header = "fruit,quantity";
-
+    void getReport_withData_ok() {
         storage.put("apple", 10);
         storage.put("banana", 20);
-
-        String report = reportGenerator.getReport();
-        String[] lines = report.split(System.lineSeparator());
-
-        assertEquals(header, lines[0]);
-
-        assertTrue("apple,10".equals(lines[1]) || "apple,10".equals(lines[2]));
-        assertTrue("banana,20".equals(lines[1]) || "banana,20".equals(lines[2]));
+        String expected = HEADER + System.lineSeparator()
+                + "apple,10" + System.lineSeparator()
+                + "banana,20";
+        String actual = reportGenerator.getReport();
+        assertEquals(sortReport(expected), sortReport(actual));
     }
 
     @Test
-    void emptyStorage_reportContainsOnlyHeader() {
-        String report = reportGenerator.getReport();
+    void getReport_emptyStorage_ok() {
+        String expected = HEADER;
+        String actual = reportGenerator.getReport();
+        assertEquals(expected, actual.trim());
+    }
+
+    private String sortReport(String report) {
         String[] lines = report.split(System.lineSeparator());
-
-        assertEquals("fruit,quantity", lines[0]);
-
-        assertTrue(lines.length == 1 || (lines.length == 2 && lines[1].isEmpty()));
+        if (lines.length <= 1) {
+            return report;
+        }
+        List<String> dataLines = Arrays
+                .stream(lines, 1, lines.length)
+                .sorted()
+                .collect(Collectors.toList());
+        List<String> allLines = new ArrayList<>();
+        allLines.add(lines[0]);
+        allLines.addAll(dataLines);
+        return String.join(System.lineSeparator(), allLines);
     }
 }

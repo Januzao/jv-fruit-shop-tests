@@ -18,95 +18,50 @@ class DataConverterImplTest {
     }
 
     @Test
-    void testCheckParts_ofFile_must_be_three_OK() {
-        List<String> lines = List.of("b banana 20");
-
-        List<FruitTransaction> fruitTransactions = dataConverter.convertToTransaction(lines);
-        assertEquals(1, fruitTransactions.size());
-
-        FruitTransaction fruitTransaction = fruitTransactions.get(0);
-        assertEquals(FruitTransaction.Operation.BALANCE,
-                fruitTransaction.getOperation());
-        assertEquals("banana", fruitTransaction.getFruit());
-        assertEquals(20, fruitTransaction.getQuantity());
+    void convertToTransaction_validInput_ok() {
+        List<String> lines = List.of(
+                "b,banana,20",
+                "s,apple,100"
+        );
+        List<FruitTransaction> expected = List.of(
+                new FruitTransaction(FruitTransaction.Operation.BALANCE, "banana", 20),
+                new FruitTransaction(FruitTransaction.Operation.SUPPLY, "apple", 100)
+        );
+        List<FruitTransaction> actual = dataConverter.convertToTransaction(lines);
+        assertEquals(expected, actual);
     }
 
     @Test
     void convertToTransaction_lessColumns_throwsException() {
-        List<String> lines = List.of("b banana");
-
+        List<String> lines = List.of("b,banana");
         assertThrows(IllegalArgumentException.class,
                 () -> dataConverter.convertToTransaction(lines));
-
     }
 
     @Test
     void convertToTransaction_moreColumns_throwsException() {
-        List<String> lines = List.of("b banana 20 e");
-
+        List<String> lines = List.of("b,banana,20,e");
         assertThrows(IllegalArgumentException.class,
                 () -> dataConverter.convertToTransaction(lines));
-
     }
 
     @Test
     void convertToTransaction_invalidQuantityFormat_throwsException() {
-        List<String> lines = List.of("b banana20 e");
-
-        assertThrows(IllegalArgumentException.class,
-                () -> dataConverter.convertToTransaction(lines));
-
-    }
-
-    @Test
-    void convertToTransaction_comaSeparator_throwsException() {
-        List<String> lines = List.of("b, banana 20");
-
-        assertThrows(IllegalArgumentException.class,
-                () -> dataConverter.convertToTransaction(lines));
-
-    }
-
-    @Test
-    void testOperation_Ok() {
-        List<String> lines = List.of("b banana 20");
-
-        List<FruitTransaction> fruitTransactions = dataConverter.convertToTransaction(lines);
-        FruitTransaction fruitTransaction = fruitTransactions.get(0);
-        assertEquals(FruitTransaction.Operation.BALANCE,
-                fruitTransaction.getOperation());
-    }
-
-    @Test
-    void testOperation_invalidOperation_throwsException() {
-        List<String> lines = List.of("x banana 20");
-
+        List<String> lines = List.of("b,banana,twenty");
         assertThrows(IllegalArgumentException.class,
                 () -> dataConverter.convertToTransaction(lines));
     }
 
     @Test
-    void testFruit_Ok() {
-        List<String> lines = List.of("b banana 20");
-
-        List<FruitTransaction> fruitTransactions = dataConverter.convertToTransaction(lines);
-        FruitTransaction fruitTransaction = fruitTransactions.get(0);
-        assertEquals("banana", fruitTransaction.getFruit());
+    void convertToTransaction_invalidOperation_throwsException() {
+        List<String> lines = List.of("x,banana,20");
+        assertThrows(IllegalArgumentException.class,
+                () -> dataConverter.convertToTransaction(lines));
     }
 
     @Test
-    void testQuantity_Ok() {
-        List<String> lines = List.of("b banana 20");
-
-        List<FruitTransaction> fruitTransactions = dataConverter.convertToTransaction(lines);
-        FruitTransaction fruitTransaction = fruitTransactions.get(0);
-        assertEquals(20, fruitTransaction.getQuantity());
-    }
-
-    @Test
-    void testQuantity_negative_throwsException() {
-        List<String> lines = List.of("b banana -1");
-
+    void convertToTransaction_negativeQuantity_throwsException() {
+        List<String> lines = List.of("b,banana,-1");
         assertThrows(IllegalArgumentException.class,
                 () -> dataConverter.convertToTransaction(lines));
     }

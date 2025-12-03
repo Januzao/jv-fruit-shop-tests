@@ -20,7 +20,7 @@ public class ReadCsvFileImpl implements ReadCsvFile {
                 if (line.isBlank()) {
                     continue;
                 }
-                lines.add(line.replace(",", " "));
+                lines.add(line);
             }
         } catch (IOException e) {
             throw new RuntimeException("Cannot read file from resources: " + fileName, e);

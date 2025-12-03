@@ -7,12 +7,13 @@ import java.util.List;
 
 public class DataConverterImpl implements DataConverter {
     private static final int EXPECTED_PARTS = 3;
+    private static final String SEPARATOR = ",";
 
     @Override
     public List<FruitTransaction> convertToTransaction(List<String> transactions) {
         List<FruitTransaction> fruitTransactions = new ArrayList<>();
         for (String transaction : transactions) {
-            String[] data = transaction.split(" ");
+            String[] data = transaction.split(SEPARATOR);
             if (data.length != EXPECTED_PARTS) {
                 throw new IllegalArgumentException("Invalid transaction format: "
                         + transaction);
@@ -35,4 +36,3 @@ public class DataConverterImpl implements DataConverter {
         return fruitTransactions;
     }
 }
-
